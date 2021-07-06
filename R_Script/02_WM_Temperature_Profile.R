@@ -5,9 +5,9 @@
 
 # Extracting predicted temperature patterns for the different domains in NEON
 
-##  Using GAM approachs to model seasonal max daily temperature for all neon Domains
-## across the SIX years of our study. The predicted temperautre values will be 
-## used to simulate seasonal mosquito population dynamics 
+##  Using GAM approaches to model seasonal max daily temperature for all neon Domains
+## across the SIX years of our study. The predicted temperature values will be 
+## used to simulate seasonal mosquito population dynamics
 
 ## Loading required libraries
 
@@ -177,4 +177,4 @@ colnames(temp.df)[4] <- "MaxTemp"
 
 ## Saving temperature data as an rData file
 
-saveRDS(temp.df, "temp.rds")
+saveRDS(temp.df, "temp.rdata")

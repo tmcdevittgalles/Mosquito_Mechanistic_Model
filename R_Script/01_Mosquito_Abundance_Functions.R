@@ -1,7 +1,7 @@
 ###### Powell Center: Phenological patterns of mosquitoes #######
 # Travis McDevitt-Galles
 # 06/30/2021
-# title: 01_WM_Mechanistic Model
+# title: 01_Mosquito_Abundance_Functions.R
 
 # Mechanistic model for mosquito abundance patterns. 
 
@@ -30,15 +30,15 @@ TPC <- function( Temp, Toptim, CTmax, sigma){
   return(perform)
   
 }
-
-## testing the TPC function
-temp <- seq(-5, 45, length.out = 100) # initial temperature range
-
-at1 <- TPC( Temp = temp, Toptim = 22, CTmax= 35, sigma = 1)
-
-# plotting the thermal performance curve
-
-plot(x= temp, y= at1)
+# 
+# ## testing the TPC function
+# temp <- seq(-5, 45, length.out = 100) # initial temperature range
+# 
+# at1 <- TPC( Temp = temp, Toptim = 22, CTmax= 35, sigma = 1)
+# 
+# # plotting the thermal performance curve
+# 
+# plot(x= temp, y= at1)
 # doesn't look that good but we can carry on with it
 
 
@@ -133,61 +133,58 @@ Mosq_TwoStage <- function( time, init, pars, temp ){
   
 }
 
-
 ####### Exploring the model 
 
 
-parameter <- c(
-  
-              #### Demographic rates 
-  
-              3, ## Fecundity
-              0.55, ## adult mortality
-              0.4, ## larval mortality
-              0.15, ## Development rate
-              
-              #### Thermal performance curve traits
-              
-              20, ## development optimal temp
-              25, ## development maximum temp
-              1.5 ## Sigma
-)
-
-inits <- c(
-            1000, # initial juvenile population size
-            0 # initial adult population size
-)
-
-
-### exploring the initial model 
-
-
-dum.df <- select(pred.df,c("DOY", "Temp"))
-
-at1 <- Mosq_TwoStage(time=dum.df$DOY, init=inits, pars = parameter,
-                     temp =  dum.df$Temp)
-
-
-
-pop_dynamics <- at1 %>% filter(DOY >124 ) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= Adult), 
-                       color='Navy Blue',size=2,alpha=.5) +
-  geom_line(aes(x=DOY, y= Juv),
-            color ="Brown",size=2,alpha=.5)
-
-pop_dynamics
-
-
-
-dev_dynamics <- at1 %>% filter(DOY >124 ) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= DevRate), 
-                       color='Navy Blue',size=2,alpha=.5) +
-  geom_line(aes(x=DOY, y= (Temp/max(at1$Temp))*.2 ),
-           color ="Brown",size=2,alpha=.5)
-
-dev_dynamics
-
-
+# parameter <- c(
+#   
+#   #### Demographic rates 
+#   
+#   3, ## Fecundity
+#   0.55, ## adult mortality
+#   0.4, ## larval mortality
+#   0.15, ## Development rate
+#   
+#   #### Thermal performance curve traits
+#   
+#   20, ## development optimal temp
+#   25, ## development maximum temp
+#   1.5 ## Sigma
+# )
+# 
+# inits <- c(
+#   1000, # initial juvenile population size
+#   0 # initial adult population size
+# )
+# 
+# 
+# ### exploring the initial model 
+# 
+# 
+# dum.df <- select(pred.df,c("DOY", "Temp"))
+# 
+# at1 <- Mosq_TwoStage(time=dum.df$DOY, init=inits, pars = parameter,
+#                      temp =  dum.df$Temp)
+# 
+# 
+# 
+# pop_dynamics <- at1 %>% filter(DOY >124 ) %>% 
+#   ggplot() + geom_line(aes(x=DOY, y= Adult), 
+#                        color='Navy Blue',size=2,alpha=.5) +
+#   geom_line(aes(x=DOY, y= Juv),
+#             color ="Brown",size=2,alpha=.5)
+# 
+# pop_dynamics
+# 
+# 
+# 
+# dev_dynamics <- at1 %>% filter(DOY >124 ) %>% 
+#   ggplot() + geom_line(aes(x=DOY, y= DevRate), 
+#                        color='Navy Blue',size=2,alpha=.5) +
+#   geom_line(aes(x=DOY, y= (Temp/max(at1$Temp))*.2 ),
+#             color ="Brown",size=2,alpha=.5)
+# 
+# dev_dynamics
 
 ################################################################################
 ################################################################################
@@ -340,74 +337,74 @@ Mosq_AllTPC <- function( time, init, ParBase, TPC ,temp ){
 }
 
 
-
-Base_Par <- c(
- 2, ## Fecundity
-  0.5, ## adult mortality
-  0.4, ## larval mortality
-  0.15 ## Development rate
-)
-
-TPC_Par <- c(
-    # Fecundity 
-  20, ## development optimal temp
-  25, ## development maximum temp
-  1.5, ## Sigma
-    # Adult mortality
-  15, ## development optimal temp
-  25, ## development maximum temp
-  5.5, ## Sigma
-    # Larval morality
-  15, ## development optimal temp
-  25, ## development maximum temp
-  5.5, ## Sigma
-    # Larval development rate
-  20, ## development optimal temp
-  25, ## development maximum temp
-  1.5 ## Sigma
-)
-
-inits <- c(
-  10, # initial juvenile population size
-  0 # initial adult population size
-)
-
-
-dum.df <- select(pred.df,c("DOY", "Temp"))
-
-at1 <- Mosq_AllTPC(time=dum.df$DOY, init=inits, ParBase =  Base_Par,
-                   TPC = TPC_Par, temp =  dum.df$Temp)
-
-
-pop_dynamics <- at1 %>% filter(DOY >124 ) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= Adult), 
-                       color='Navy Blue',size=2,alpha=.5) +
-  geom_line(aes(x=DOY, y= Juv),
-            color ="Brown",size=2,alpha=.5)
-
-pop_dynamics
-
-
-dev_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= 1/DevRate), 
-                       color='Navy Blue',size=2,alpha=.5) 
-
-
-fec_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= FecRate), 
-                       color='dark red',size=2,alpha=.5) 
-
-
-lmort_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
-  ggplot() + geom_line(aes(x=DOY, y=lMortRate), 
-                       color='Dark green',size=2,alpha=.5) 
-
-
-amort_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= aMortRate), 
-                       color='dark orange',size=2,alpha=.5) 
-
-
-library(patchwork)
-
-(fec_dynamics | amort_dynamics)/(dev_dynamics|lmort_dynamics)
+# 
+# Base_Par <- c(
+#  2, ## Fecundity
+#   0.5, ## adult mortality
+#   0.4, ## larval mortality
+#   0.15 ## Development rate
+# )
+# 
+# TPC_Par <- c(
+#     # Fecundity 
+#   20, ## development optimal temp
+#   25, ## development maximum temp
+#   1.5, ## Sigma
+#     # Adult mortality
+#   15, ## development optimal temp
+#   25, ## development maximum temp
+#   5.5, ## Sigma
+#     # Larval morality
+#   15, ## development optimal temp
+#   25, ## development maximum temp
+#   5.5, ## Sigma
+#     # Larval development rate
+#   20, ## development optimal temp
+#   25, ## development maximum temp
+#   1.5 ## Sigma
+# )
+# 
+# inits <- c(
+#   10, # initial juvenile population size
+#   0 # initial adult population size
+# )
+# 
+# 
+# dum.df <- select(pred.df,c("DOY", "Temp"))
+# 
+# at1 <- Mosq_AllTPC(time=dum.df$DOY, init=inits, ParBase =  Base_Par,
+#                    TPC = TPC_Par, temp =  dum.df$Temp)
+# 
+# 
+# pop_dynamics <- at1 %>% filter(DOY >124 ) %>% 
+#   ggplot() + geom_line(aes(x=DOY, y= Adult), 
+#                        color='Navy Blue',size=2,alpha=.5) +
+#   geom_line(aes(x=DOY, y= Juv),
+#             color ="Brown",size=2,alpha=.5)
+# 
+# pop_dynamics
+# 
+# 
+# dev_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
+#   ggplot() + geom_line(aes(x=DOY, y= 1/DevRate), 
+#                        color='Navy Blue',size=2,alpha=.5) 
+# 
+# 
+# fec_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
+#   ggplot() + geom_line(aes(x=DOY, y= FecRate), 
+#                        color='dark red',size=2,alpha=.5) 
+# 
+# 
+# lmort_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
+#   ggplot() + geom_line(aes(x=DOY, y=lMortRate), 
+#                        color='Dark green',size=2,alpha=.5) 
+# 
+# 
+# amort_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>% 
+#   ggplot() + geom_line(aes(x=DOY, y= aMortRate), 
+#                        color='dark orange',size=2,alpha=.5) 
+# 
+# 
+# library(patchwork)
+# 
+# (fec_dynamics | amort_dynamics)/(dev_dynamics|lmort_dynamics)
