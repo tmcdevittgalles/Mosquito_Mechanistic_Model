@@ -3,14 +3,14 @@
 # 06/30/2021
 # title: 01_WM_Mechanistic Model
 
-# Mechanistic model for mosquito abundace patterns. 
+# Mechanistic model for mosquito abundance patterns. 
 
 ## The TPC function comes from Childress and Letcher 2017 - Ecology
 ## Estimated parameters (Toptim and CTmax) estimated based on reported values
 ## from Mordecai et al. 2019
 
 
-#### Building a thermal performance curve for the different themeral sensitive
+#### Building a thermal performance curve for the different thermal sensitive
 #### Traits
 
 TPC <- function( Temp, Toptim, CTmax, sigma){
