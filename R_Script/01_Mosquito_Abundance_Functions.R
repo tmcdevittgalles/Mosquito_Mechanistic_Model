@@ -1,5 +1,4 @@
 ###### Powell Center: Phenological patterns of mosquitoes #######
-
 # Travis McDevitt-Galles
 # 06/30/2021
 # title: 01_WM_Mechanistic Model
