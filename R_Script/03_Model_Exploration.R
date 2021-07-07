@@ -29,23 +29,23 @@ temp.df <- readRDS( here("Data", "temp.rdata") )
 ################################################################################
 
 
-####### Exploring the model 
+##### Exploring the model 
 
 
 parameter <- c(
   
   #### Demographic rates 
   
-  3, ## Fecundity
-  0.55, ## adult mortality
-  0.4, ## larval mortality
-  0.15, ## Development rate
+  2, ## Fecundity
+  0.4, ## adult mortality
+  0.6, ## larval mortality
+  0.2, ## Development rate
   
   #### Thermal performance curve traits
   
-  20, ## development optimal temp
-  25, ## development maximum temp
-  1.5 ## Sigma
+  25, ## development optimal temp
+  40, ## development maximum temp
+  2 ## Sigma
 )
 
 inits <- c(
@@ -60,28 +60,38 @@ inits <- c(
 
 dum.df <- filter(temp.df , fYear == 2017 & Site == "HARV" )
 
-at1 <- Mosq_TwoStage(time=dum.df$DOY, init=inits, pars = parameter,
+predicted <- Mosq_TwoStage(time=dum.df$DOY, init=inits, pars = parameter,
                        temp =  dum.df$MaxTemp)
 
 
 
-pop_dynamics <- at1 %>% filter(DOY >124 ) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= Adult), 
-                       color='Navy Blue',size=2,alpha=.5) +
-  geom_line(aes(x=DOY, y= Juv),
-            color ="Brown",size=2,alpha=.5)
+pop_dynamics <- predicted %>% filter(DOY >124 ) %>% 
+  ggplot() + geom_line(aes(x=DOY, y= Adult,color='1'), 
+                       size=2,alpha=.5)+
+  geom_line(aes(x=DOY, y= Juv ,color='2'),
+            size=2,alpha=.5)+ ylab("Abundance") +
+  scale_color_manual(values = c( "1" = "Navy Blue","2"= "Brown"), 
+                     labels=c("Adult", "Juv"), name= "Life stage")+
+  theme_classic()
 
 pop_dynamics
 
 
-
-dev_dynamics <- at1 %>% filter(DOY >124 ) %>% 
-  ggplot() + geom_line(aes(x=DOY, y= DevRate), 
-                       color='Navy Blue',size=2,alpha=.5) +
-  geom_line(aes(x=DOY, y= (Temp/max(at1$Temp))*.2 ),
-            color ="Brown",size=2,alpha=.5)
+##
+dev_dynamics <- predicted %>% 
+  ggplot() + geom_line(aes(x=DOY, y= DevRate,color='1'), 
+                       size=2,alpha=.5) +
+  geom_line(aes(x=DOY, y= (Temp/max(Temp))*.2 ,color ="2"),
+            size=2,alpha=.5)+ theme_classic()+
+  scale_color_manual(values = c( "1" = "Navy Blue","2"= "Brown"), 
+                     labels=c("Development rate", "Temperature"), name= "") +
+  scale_y_continuous(
+    "Development rate", 
+    sec.axis = sec_axis(~ (. /.20) *max(predicted$Temp), name = "Temperature (C)")
+  )
 
 dev_dynamics
+
 
 
 
@@ -97,28 +107,28 @@ dev_dynamics
 
 
 Base_Par <- c(
- 2, ## Fecundity
-  0.5, ## adult mortality
-  0.4, ## larval mortality
-  0.15 ## Development rate
+  2, ## Fecundity
+  0.3, ## adult mortality
+  0.6, ## larval mortality
+  0.2 ## Development rate
 )
 
 TPC_Par <- c(
     # Fecundity
-  20, ## development optimal temp
-  25, ## development maximum temp
+  28, ## development optimal temp
+  40, ## development maximum temp
   1.5, ## Sigma
     # Adult mortality
-  15, ## development optimal temp
-  25, ## development maximum temp
-  5.5, ## Sigma
-    # Larval morality
-  15, ## development optimal temp
-  25, ## development maximum temp
-  5.5, ## Sigma
-    # Larval development rate
   20, ## development optimal temp
-  25, ## development maximum temp
+  40, ## development maximum temp
+  2.5, ## Sigma
+    # Larval morality
+  26, ## development optimal temp
+  30, ## development maximum temp
+  2.5, ## Sigma
+    # Larval development rate
+  25, ## development optimal temp
+  40, ## development maximum temp
   1.5 ## Sigma
 )
 
@@ -130,37 +140,41 @@ inits <- c(
 
 dum.df <- filter(temp.df , fYear == 2017 & Site == "HARV" )
 
-at1 <- Mosq_AllTPC(time=dum.df$DOY, init=inits, ParBase =  Base_Par,
+predicted <- Mosq_AllTPC(time=dum.df$DOY, init=inits, ParBase =  Base_Par,
                    TPC = TPC_Par, temp =  dum.df$MaxTemp)
 
 
-pop_dynamics <- at1 %>% filter(DOY >124 ) %>%
-  ggplot() + geom_line(aes(x=DOY, y= Adult),
-                       color='Navy Blue',size=2,alpha=.5) +
-  geom_line(aes(x=DOY, y= Juv),
-            color ="Brown",size=2,alpha=.5)
+
+pop_dynamics <- predicted %>% filter(DOY >124 ) %>% 
+  ggplot() + geom_line(aes(x=DOY, y= Adult,color='1'), 
+                       size=2,alpha=.5)+
+  geom_line(aes(x=DOY, y= Juv ,color='2'),
+            size=2,alpha=.5)+ ylab("Abundance") +
+  scale_color_manual(values = c( "1" = "Navy Blue","2"= "Brown"), 
+                     labels=c("Adult", "Juv"), name= "Life stage")+
+  theme_classic()
 
 pop_dynamics
 
 
-dev_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>%
+dev_dynamics <-predicted %>% filter(DOY >124 & DOY < 300) %>%
   ggplot() + geom_line(aes(x=DOY, y= 1/DevRate),
                        color='Navy Blue',size=2,alpha=.5) +
   ylab("Days to adult") + theme_classic()
 
 
-fec_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>%
+fec_dynamics <-predicted %>% filter(DOY >124 & DOY < 300) %>%
   ggplot() + geom_line(aes(x=DOY, y= FecRate),
                        color='dark red',size=2,alpha=.5)+
   ylab("Number of eggs per day per mosquito") + theme_classic()
 
-lmort_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>%
+lmort_dynamics <- predicted %>% filter(DOY >124 & DOY < 300) %>%
   ggplot() + geom_line(aes(x=DOY, y=lMortRate),
                        color='Dark green',size=2,alpha=.5)+
   ylab("Larvae mortality rate")+ theme_classic()
 
 
-amort_dynamics <- at1 %>% filter(DOY >124 & DOY < 300) %>%
+amort_dynamics <- predicted %>% filter(DOY >124 & DOY < 300) %>%
   ggplot() + geom_line(aes(x=DOY, y= aMortRate),
                        color='dark orange',size=2,alpha=.5) +
   ylab("Adult mortality rate") + theme_classic()

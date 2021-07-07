@@ -87,13 +87,13 @@ Mosq_TwoStage <- function( time, init, pars, temp ){
    
    ## Defining demographic parameters 
   
-   fec <- pars[1]      ## number of new 'juvinile' mosquitoes added per day per 
+   fec <- pars[1]      ## number of new 'juvenile' mosquitoes added per day per 
                        ## female adult mosquito
-   aMortal <- pars[2]  ## adult mortaility rate: proportion of adults that die 
+   aMortal <- pars[2]  ## adult mortality rate: proportion of adults that die 
                        ## per day (24 hr)
-   lMortal <- pars[3]  ## juvinile moratlit rate: proportion of larvae that die 
+   lMortal <- pars[3]  ## juvenile mortality rate: proportion of larvae that die 
                        ## per day (24 hr)
-   lDevelop <- pars[4] ## max development rate: proportion of jubiniles that 
+   lDevelop <- pars[4] ## max development rate: proportion of juveniles that 
                        ## develop into the next stage (Adult)
    
    ## Defining developmental thermal performance curve parameter
@@ -110,19 +110,19 @@ Mosq_TwoStage <- function( time, init, pars, temp ){
    for( i in 1:(nrow(m.df)-1)){
      ## Larval dynamics
      m.df$Juv[i+1] <-  m.df$Adult[i] * fec + ## new Juv from adults
-                        m.df$Juv[i] * ( 1 - lMortal) - # Propotion surviving
-       m.df$Juv[i] *  TPC( 20,  Toptim = Toptim , # propotion devel.
+                        m.df$Juv[i] * ( 1 - lMortal) - # Proportion surviving
+       m.df$Juv[i] *  TPC( 20,  Toptim = Toptim , # proportion devel.
                                             CTmax =  CTmax , # into adults
                                             sigma = sigma) * lDevelop 
 
      ## Adult dynamics
      m.df$Adult[i+1] <-  m.df$Adult[i] * ( 1-aMortal) + # adult survival
-       m.df$Juv[i] *  TPC( temp[i],  Toptim = Toptim , # propotion devel.
+       m.df$Juv[i] *  TPC( temp[i],  Toptim = Toptim , # proportion devel.
                             CTmax =  CTmax , # into adults
                             sigma = sigma) * lDevelop
      
      # tracking the development rate across time
-     m.df$DevRate[i] <-  TPC( m.df$Temp[i],  Toptim = Toptim , # propotion devel.
+     m.df$DevRate[i] <-  TPC( m.df$Temp[i],  Toptim = Toptim , # proportion devel.
                                              CTmax =  CTmax , # into adults
                                              sigma = sigma) * lDevelop 
    
@@ -238,13 +238,13 @@ Mosq_AllTPC <- function( time, init, ParBase, TPC ,temp ){
     
     ## Defining demographic parameters 
     
-    fec <- ParBase[1]      ##  max number of new 'juvinile' mosquitoes added 
+    fec <- ParBase[1]      ##  max number of new 'juvenile' mosquitoes added 
                            ## per day per female adult mosquito
-    aMortal <- ParBase[2]  ## adult mortaility rate: proportion of adults that die 
+    aMortal <- ParBase[2]  ## adult mortality rate: proportion of adults that die 
                            ## per day (24 hr)
-    lMortal <- ParBase[3]  ## juvinile moratlit rate: proportion of larvae that die 
+    lMortal <- ParBase[3]  ## juvenile mortality rate: proportion of larvae that die 
                            ## per day (24 hr)
-    lDevelop <- ParBase[4] ## max development rate: proportion of jubiniles that 
+    lDevelop <- ParBase[4] ## max development rate: proportion of juveniles that 
                            ## develop into the next stage (Adult)
     
     ## Defining developmental thermal performance curve parameter
